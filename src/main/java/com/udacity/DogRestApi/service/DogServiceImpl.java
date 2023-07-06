@@ -23,7 +23,7 @@ public class DogServiceImpl implements DogService {
     }
 
     @Override
-    public String retrieveDogBreedById(Long id) {
+    public String retrieveDogBreedById(long id) {
         return dogRepository.findBreedById(id);
     }
 

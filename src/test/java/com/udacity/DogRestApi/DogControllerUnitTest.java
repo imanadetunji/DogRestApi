@@ -53,6 +53,6 @@ public class DogControllerUnitTest {
         mockMvc.perform(get("/1/breed"))
                 .andExpect(status().isOk());
 
-        verify(dogService, times(1)).retrieveDogBreedById(1L);
+        verify(dogService, times(1)).retrieveDogBreedById(1);
     }
 }
