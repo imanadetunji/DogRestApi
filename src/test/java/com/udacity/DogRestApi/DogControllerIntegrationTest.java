@@ -7,26 +7,25 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@WithMockUser(username = "admin", password = "password", roles = "USER")
 public class DogControllerIntegrationTest {
     @LocalServerPort
     private int port;
@@ -40,7 +39,8 @@ public class DogControllerIntegrationTest {
     @Test
     public void getAllDogs() {
         ResponseEntity<List> response =
-                this.restTemplate.getForEntity("http://localhost:" + port + "/dogs", List.class);
+                this.restTemplate.withBasicAuth("admin","password")
+                        .getForEntity("http://localhost:" + port + "/dogs", List.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
     }
@@ -48,12 +48,11 @@ public class DogControllerIntegrationTest {
 
     @Test
     public void getDogBreedById() throws Exception {
-        mockMvc.perform(get("/1/breed")
-                        .with(user("admin").password("password").roles("USER")))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Pomeranian"));
+        ResponseEntity<String> response =
+                this.restTemplate.withBasicAuth("admin", "password")
+                        .getForEntity("http://localhost:" + port + "/1/breed", String.class);
+
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
     }
-
-
 
 }

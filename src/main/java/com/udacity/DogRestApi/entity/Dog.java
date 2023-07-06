@@ -13,7 +13,9 @@ public class Dog {
     private Long id;
 
     private String name;
+
     private String breed;
+
     private String origin;
 
     public Dog(Long id, String name, String breed, String origin) {
